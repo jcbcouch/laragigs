@@ -74,4 +74,16 @@ class ListingController extends Controller
 
         return back()->with('message', 'Listing updated successfully!');
     }
+
+    public function destroy(Listing $listing) {
+        // if($listing->user_id != auth()->id()) {
+        //     abort(403, 'Unauthorized Action');
+        // }
+        
+        // if($listing->logo && Storage::disk('public')->exists($listing->logo)) {
+        //     Storage::disk('public')->delete($listing->logo);
+        // }
+        $listing->delete();
+        return redirect('/')->with('message', 'Listing deleted successfully');
+    }
 }
