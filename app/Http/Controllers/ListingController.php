@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Listing;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class ListingController extends Controller
 {
@@ -51,10 +52,9 @@ class ListingController extends Controller
     }
 
     public function update(Request $request, Listing $listing) {
-        // Make sure logged in user is owner
-        // if($listing->user_id != auth()->id()) {
-        //     abort(403, 'Unauthorized Action');
-        // }
+        if($listing->user_id != auth()->id()) {
+            abort(403, 'Unauthorized Action');
+        }
         
         $formFields = $request->validate([
             'title' => 'required',
@@ -76,14 +76,18 @@ class ListingController extends Controller
     }
 
     public function destroy(Listing $listing) {
-        // if($listing->user_id != auth()->id()) {
-        //     abort(403, 'Unauthorized Action');
-        // }
+        if($listing->user_id != auth()->id()) {
+            abort(403, 'Unauthorized Action');
+        }
         
-        // if($listing->logo && Storage::disk('public')->exists($listing->logo)) {
-        //     Storage::disk('public')->delete($listing->logo);
-        // }
+        if($listing->logo && Storage::disk('public')->exists($listing->logo)) {
+            Storage::disk('public')->delete($listing->logo);
+        }
         $listing->delete();
         return redirect('/')->with('message', 'Listing deleted successfully');
+    }
+
+    public function manage() {
+        return view('listings.manage', ['listings' => auth()->user()->listings()->get()]);
     }
 }
